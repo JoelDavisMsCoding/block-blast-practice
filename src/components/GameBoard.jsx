@@ -1,6 +1,6 @@
 import React from "react";
 
-function GameBoard({ board }) {
+function GameBoard({board, onCellClick}) {
   return (
     <div className="board">
       {board.map((row, rIndex) =>
@@ -8,12 +8,11 @@ function GameBoard({ board }) {
           <div
             key={`${rIndex}-${cIndex}`}
             className={`cell ${cell ? "filled" : ""}`}
-            data-row={rIndex}
-            data-col={cIndex}
+            onClick={() => onCellClick(rIndex, cIndex)}
           />
-        ))
+        )) //End row.map parenthesis
       )}
-    </div>
+    </div> //End className board div
   );
 }
 
