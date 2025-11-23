@@ -1,5 +1,5 @@
 body {
-  background-color: #222;
+  background-color: #222;;
   color: white;
   font-family: sans-serif;
   display: flex;
@@ -11,8 +11,11 @@ body {
   padding-top: 40px;
 }
 
+h1 {place-content: center;}
+
 .board {
   display: grid;
+  justify-content: center;
   grid-template-columns: repeat(8, 50px);
   grid-template-rows: repeat(8, 50px);
   gap: 4px;
@@ -28,5 +31,38 @@ body {
 }
 
 .cell.filled {
+  background-color: #f39c12;
+}
+
+.pieces-area {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 30px;
+}
+
+.piece {
+  display: grid;
+  place-content: center;  /* This will stop the horizontal space in the shape*/
+  gap: 4px;
+  cursor: grab;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.piece.empty {
+  width: 80px;
+  height: 60px;
+  opacity: 0.2;
+}
+
+.mini-cell {
+  width: 50px;
+  height: 50px;
+  background-color:transparent;
+  border-radius: 5px;
+}
+
+.mini-cell.filled {
   background-color: #f39c12;
 }
