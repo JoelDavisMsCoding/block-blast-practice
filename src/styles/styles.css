@@ -66,3 +66,13 @@ h1 {place-content: center;}
 .mini-cell.filled {
   background-color: #f39c12;
 }
+
+/* Valid ghost preview */
+.ghost-valid {
+  background-color: rgba(0, 255, 0, 0.45) !important;
+}
+
+/* Invalid placement preview */
+.ghost-invalid {
+  background-color: rgba(255, 0, 0, 0.45) !important;
+}
