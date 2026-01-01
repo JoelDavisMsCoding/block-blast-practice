@@ -31,15 +31,15 @@ function App() {
 
     //Place the piece on the board
     setBoard(prev => {  //prev is a argument made by me but the first argument will always be set as a copy of previous state/board
-      const newboard = prev.map(r => [...r]); //Saving a copy of the board as newBoard
+      const newBoard = prev.map(r => [...r]); //Saving a copy of the board as newBoard
       piece.block.forEach((rArr, rIndex) =>{ //piece comes from argument/block comes from pieces.js
         rArr.forEach((val, cIndex) =>{
           if (val === 1){
-            newboard[row + rIndex][col + cIndex] = 1;
+            newBoard[row + rIndex][col + cIndex] = 1;
           }
         });
       });
-      return newboard
+      return clearLines(newBoard);
     });
 
     //Remove used piece
@@ -69,6 +69,55 @@ function App() {
       }
     }
     return true;
+  }
+
+  function getFullRows(board){
+    const fullRows = [];
+    for (let r = 0; r < 8; r++){
+      if (board[r].every(cell => cell === 1)){
+        fullRows.push(r);
+      }
+    }
+    return fullRows;
+  }
+  
+  function getFullCols(board){
+    const fullCols = [];
+    for (let c = 0; c < 0; c++){
+      let isFull = false;
+      for (let r = 0; r < 8; r++){
+        if (board[r][c] !== 1){
+          isFull = false;
+          break;
+        }
+      }
+      if (isFull){
+        fullCols.push(c);
+      }
+    }
+    return fullCols;
+  }
+  
+  function clearLines(board){
+    const rows = getFullRows(board);
+    const cols = getFullCols(board);
+    if (rows.length === 0 && cols.length === 0){
+      return board;
+    }
+
+    const newBoard = board.map(row => [...row]);
+
+    rows.forEach(r => {
+      for (let c = 0; c < 8; c++){
+        newBoard[r][c] = 0;
+      }
+    });
+
+    cols.forEach(c => {
+      for (let r = 0; r < 8; r++){
+        newBoard[r][c] = 0;
+      }
+    })
   }
 
   return (
