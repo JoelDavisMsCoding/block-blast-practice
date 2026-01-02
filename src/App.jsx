@@ -83,7 +83,7 @@ function App() {
   
   function getFullCols(board){
     const fullCols = [];
-    for (let c = 0; c < 0; c++){
+    for (let c = 0; c < 8; c++){
       let isFull = false;
       for (let r = 0; r < 8; r++){
         if (board[r][c] !== 1){
@@ -118,6 +118,7 @@ function App() {
         newBoard[r][c] = 0;
       }
     })
+    return newBoard;
   }
 
   return (
