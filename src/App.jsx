@@ -47,6 +47,13 @@ function App() {
     updatedPieces[draggedPieceIndex] = null;
     setAvailablePieces(updatedPieces);
 
+    //Replace available pieces after all three are used.
+    for (let piecesIndex = 0; piecesIndex < 3; piecesIndex++){
+      if (updatedPieces.every(index => index === null)){
+        setAvailablePieces(generateThreePieces());
+      }
+    };
+
     setHoverCell(null); //Clears/Stops the highlight after dropping the piece/releasing the mouse.
     setDraggedPieceIndex(null);
   }

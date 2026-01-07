@@ -1,7 +1,6 @@
 import React from "react";
 
 function GameBoard({board, hoverCell, draggedPiece, canPlacePiece, onDragOver, onDrop}) {
-  console.log("GameBoard props:", board);
   return (
     <div className="board">
       {board.map((row, rIndex) => 
