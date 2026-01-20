@@ -1,10 +1,13 @@
 import React from "react";
 
-function GameBoard({board, hoverCell, draggedPiece, canPlacePiece, onDragOver, onDrop}) {
+function GameBoard({board, clearingCells, hoverCell, draggedPiece, canPlacePiece, onDragOver, onDrop}) {
   return (
     <div className="board">
       {board.map((row, rIndex) => 
         row.map((cell, cIndex) => { //cell will have the rows and columns 8 by 8 when you print/display cell.
+          const isClearing = clearingCells?.some(
+            c => c.row === rIndex && c.col === cIndex
+          );
           let ghostClass = ""
 
           if (hoverCell && draggedPiece){
@@ -26,7 +29,11 @@ function GameBoard({board, hoverCell, draggedPiece, canPlacePiece, onDragOver, o
           return (
             <div
               key={`${rIndex}-${cIndex}`}
-              className={`cell ${cell ? "filled" : ""} ${ghostClass}`}
+              className={`cell
+                ${cell ? "filled" : ""}
+                ${ghostClass}
+                ${isClearing ? "clearing" : ""}
+              `}
               onDragOver={(e) => onDragOver(e, rIndex, cIndex)}
               onDrop={(e) => onDrop(e,rIndex, cIndex)}
             >

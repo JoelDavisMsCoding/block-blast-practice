@@ -12,6 +12,7 @@ function App() {
   const [availablePieces, setAvailablePieces] = useState(generateThreePieces());
   const [draggedPieceIndex, setDraggedPieceIndex] = useState(null);
   const [hoverCell, setHoverCell] = useState(null);
+  const [clearingCells, setClearingCells] = useState([]);
 
   function handleDragOver(e, row, col){
     e.preventDefault();
@@ -39,7 +40,8 @@ function App() {
           }
         });
       });
-      return clearLines(newBoard);
+      clearLinesAnimated(newBoard);
+      return newBoard;
     });
 
     //Remove used piece
@@ -105,34 +107,48 @@ function App() {
     return fullCols;
   }
   
-  function clearLines(board){
+  function clearLinesAnimated(board){
     const rows = getFullRows(board);
     const cols = getFullCols(board);
     if (rows.length === 0 && cols.length === 0){
       return board;
     }
 
-    const newBoard = board.map(row => [...row]);
+    const cellsToClear = [];
 
     rows.forEach(r => {
       for (let c = 0; c < 8; c++){
-        newBoard[r][c] = 0;
+        cellsToClear.push({row: r, col: c});
       }
     });
 
     cols.forEach(c => {
       for (let r = 0; r < 8; r++){
-        newBoard[r][c] = 0;
+        cellsToClear.push({row: r, col: c})
       }
     })
-    return newBoard;
-  }
+
+    setClearingCells(cellsToClear);
+    
+    setTimeout(() =>{
+      setBoard((prev) =>{
+        const newBoard = prev.map(row => [...row])
+        cellsToClear.forEach((row, col) =>{
+          newBoard[row][col] = 0;
+        });
+        return newBoard;
+      });
+      setClearingCells([]);
+    }, 300);
+    return board;
+  };
 
   return (
     <div>
       <h1>🧱 Block Blast Practice</h1>
       <GameBoard
         board={board}
+        clearingCells={clearingCells}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         hoverCell={hoverCell}
