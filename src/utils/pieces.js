@@ -38,7 +38,7 @@ export const blocks = [
 
 export function generatePiece(){
     const block = blocks[Math.floor(Math.random() * blocks.length)];
-    return {block, colorId: Math.floor(Math.random() * 6) + 1};
+    return {block, colorId: Math.floor(Math.random() * 7) + 1};
 }
 
 export function generateThreePieces(){

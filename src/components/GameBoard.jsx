@@ -1,10 +1,13 @@
 import React from "react";
 
-function GameBoard({board, clearingCells, hoverCell, draggedPiece, canPlacePiece, onDragOver, onDrop}) {
+function GameBoard({board, clearingCells, hoverCell, draggedPiece, canPlacePiece, onDragOver, onDrop, onDragLeaveBoard}) {
   return (
-    <div className="board">
+    <div
+      className="board"
+      onDragLeave={onDragLeaveBoard}
+    >
       {board.map((row, rIndex) => 
-        row.map((cell, cIndex) => { //cell will have the rows and columns 8 by 8 when you print/display cell.
+        row.map((col, cIndex) => { //cell will have the rows and columns 8 by 8 when you print/display cell.
           const isClearing = clearingCells?.some(
             c => c.row === rIndex && c.col === cIndex
           );
@@ -20,7 +23,7 @@ function GameBoard({board, clearingCells, hoverCell, draggedPiece, canPlacePiece
               for (let c = 0; c < draggedPiece.block[r].length; c++){
                 if (draggedPiece.block[r][c] === 1){
                   if (startR + r === rIndex && startC + c === cIndex){
-                    ghostClass = canPlace ? "ghost-valid" : "ghost-invalid";
+                    ghostClass = canPlace ? `ghost-valid color-${draggedPiece.colorId}` : "ghost-invalid";
                   }
                 }
               }
@@ -29,8 +32,8 @@ function GameBoard({board, clearingCells, hoverCell, draggedPiece, canPlacePiece
           return (
             <div
               key={`${rIndex}-${cIndex}`}
-              className={`cell
-                ${cell ? "filled" : ""}
+              className={`boardCell 
+                ${col ? `filled color-${col}` : ""}
                 ${ghostClass}
                 ${isClearing ? "clearing" : ""}
               `}

@@ -22,7 +22,7 @@ h1 {place-content: center;}
   margin-top: 20px;
 }
 
-.cell {
+.boardCell {
   width: 50px;
   height: 50px;
   background-color: #333;
@@ -30,9 +30,21 @@ h1 {place-content: center;}
   transition: background 0.2s;
 }
 
-.cell.filled {
-  background-color: #f39c12;
+.boardCell.filled {
+  box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4),
+              inset 2px 2px 6px rgba(255,255,255,0.6),
+              0 2px 4px rgba(0,0,0,0.4);
+  transform: scale(0.98);
+  transition: transform 0.1s ease-in-out;
 }
+
+.boardCell.filled.color-1 { background-color: green !important; }
+.boardCell.filled.color-2 { background-color: rgb(0, 128, 255) !important; }
+.boardCell.filled.color-3 { background-color: darkorange !important; }
+.boardCell.filled.color-4 { background-color: purple !important; }
+.boardCell.filled.color-5 { background-color: red !important; }
+.boardCell.filled.color-6 { background-color: gold !important; }
+.boardCell.filled.color-7 { background-color: palevioletred !important; }
 
 .pieces-area {
   display: flex;
@@ -56,23 +68,59 @@ h1 {place-content: center;}
   opacity: 0.2;
 }
 
-.mini-cell {
+.block {
   width: 50px;
   height: 50px;
-  background-color:transparent;
   border-radius: 5px;
 }
 
-.mini-cell.filled {
-  background-color: #f39c12;
+.block.filled {
+  box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4),
+              inset 2px 2px 6px rgba(255,255,255,0.6),
+              0 2px 4px rgba(0,0,0,0.4);
+  transform: scale(0.98);
+  transition: transform 0.1s ease-in-out;
 }
 
+.block.filled.color-1 { background-color: green !important; }
+.block.filled.color-2 { background-color: rgb(0, 128, 255) !important; }
+.block.filled.color-3 { background-color: darkorange !important; }
+.block.filled.color-4 { background-color: purple !important; }
+.block.filled.color-5 { background-color: red !important; }
+.block.filled.color-6 { background-color: gold !important; }
+.block.filled.color-7 { background-color: palevioletred !important; }
+
 /* Valid ghost preview */
-.ghost-valid {
-  background-color: rgba(0, 255, 0, 0.45) !important;
-}
+.ghost-valid.color-1 { background-color: green !important; }
+.ghost-valid.color-2 { background-color: rgb(0, 128, 255) !important; }
+.ghost-valid.color-3 { background-color: darkorange !important; }
+.ghost-valid.color-4 { background-color: purple !important; }
+.ghost-valid.color-5 { background-color: red !important; }
+.ghost-valid.color-6 { background-color: gold !important; }
+.ghost-valid.color-7 { background-color: palevioletred !important; }
 
 /* Invalid placement preview */
 .ghost-invalid {
-  background-color: rgba(255, 0, 0, 0.45) !important;
+  animation: flashRedWhite 0.5s infinite;
+}
+
+@keyframes flashRedWhite {
+  0% { background-color: transparent;}
+  50% { background-color: rgba(255, 0, 0, 0.45)}
+  100% { background-color: transparent;}
+}
+
+.clearing {
+  animation: popFade 0.3s ease-out forwards;
+}
+
+@keyframes popFade {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
 }
