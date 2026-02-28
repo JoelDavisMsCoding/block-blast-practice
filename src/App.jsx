@@ -13,6 +13,7 @@ function App() {
   const [draggedPieceIndex, setDraggedPieceIndex] = useState(null);
   const [hoverCell, setHoverCell] = useState(null);
   const [clearingCells, setClearingCells] = useState([]);
+  const [shake, setShake] = useState(false);
 
   useEffect(() => {
     function handleGlobalDragend(){
@@ -24,10 +25,6 @@ function App() {
     return () =>{window.removeEventListener("dragend", handleGlobalDragend)}
   }, [])
 
-  function handleDragLeaveBoard(){
-    setHoverCell(null);
-  }
-
   function handleDragEnd() {
   setHoverCell(null);
   setDraggedPieceIndex(null);
@@ -36,50 +33,57 @@ function App() {
   function handleDragOver(e, row, col){
     e.preventDefault();
     if (draggedPieceIndex === null) return;
-    setHoverCell({row, col});
+    
+    setHoverCell(prev => {
+      if (prev?.row === row && prev?.col === col){
+        return prev;
+      }
+      return {row, col}
+    });
   }
 
   function handleDrop(e, row, col){
     e.preventDefault();
-    setHoverCell(null);
-    setDraggedPieceIndex(null);
-
+    if (draggedPieceIndex === null) return;
     const piece = availablePieces[draggedPieceIndex];
     if (!piece)return; //If no piece return/do nothing
-
-    if (!canPlacePiece(piece, row, col)){ //If you can not place the piece...
+    if (!canPlacePiece(piece, row, col, board)){ //If you can not place the piece...
       console.log("Invalid Placement");
       return;
     }
 
+    // 1️⃣ Create updated board FIRST
+    const newBoard = board.map(r => [...r]);
+
     //Place the piece on the board
-    setBoard(prev => {  //prev is a argument made by me but the first argument will always be set as a copy of previous state/board
-      const newBoard = prev.map(r => [...r]); //Saving a copy of the board as newBoard
-      piece.block.forEach((rArr, rIndex) => { //piece comes from argument/block comes from pieces.js
-        rArr.forEach((val, cIndex) => {
-          if (val === 1){
-            newBoard[row + rIndex][col + cIndex] = piece.colorId
-          }
-        });
+    piece.block.forEach((rArr, rIndex) => { //piece comes from argument/block comes from pieces.js
+      rArr.forEach((val, cIndex) => {
+        if (val === 1){
+          newBoard[row + rIndex][col + cIndex] = piece.colorId
+        }
       });
-      clearLinesAnimated(newBoard);
-      return newBoard;
     });
 
-    //Remove used piece
-    const updatedPieces = [...availablePieces];
-    updatedPieces[draggedPieceIndex] = null;
-    setAvailablePieces(updatedPieces);
+    // 2️⃣ Set board ONCE
+    setBoard(newBoard);
 
-    //Replace available pieces after all three are used.
-    for (let piecesIndex = 0; piecesIndex < 3; piecesIndex++){
-      if (updatedPieces.every(index => index === null)){
-        setAvailablePieces(generateThreePieces());
+    // 3️⃣ Then run animation
+    clearLinesAnimated(newBoard);
+
+    //Remove used piece
+    setAvailablePieces(prev => {
+      const updated = [...prev];
+      updated[draggedPieceIndex] = null;
+      if (updated.every(p => p === null)){
+        return generateThreePieces();
       }
-    };
+      return updated;
+    });
+    setHoverCell(null);
+    setDraggedPieceIndex(null);
   }
   
-  function canPlacePiece(piece, startRow, startCol){
+  function canPlacePiece(piece, startRow, startCol, currentBoard = board){
     for (let r = 0; r < piece.block.length; r++) {
       for (let c = 0; c < piece.block[r].length; c++){
         if (piece.block[r][c] === 1){
@@ -90,7 +94,7 @@ function App() {
             return false;
           }
 
-          if (board[boardR][boardC] !== 0){ //making sure piece is not piece is not placed over existing piece on the board.
+          if (currentBoard[boardR][boardC] !== 0){ //making sure piece is not piece is not placed over existing piece on the board.
             return false;
           }
         }
@@ -126,11 +130,37 @@ function App() {
     return fullCols;
   }
   
+  function explodeSequential(cells){
+    let i = 0;
+    function clearNext(){
+      if (i >= cells.length){
+        setClearingCells([]);
+        return;
+      }
+
+      const cell = cells[i];
+
+      setClearingCells(prev => [...prev, cell]);
+      
+      setBoard(prev => {
+        const newBoard = prev.map(r => [...r]);
+        newBoard[cell.row][cell.col] = 0;
+        return newBoard;
+      });
+      i++;
+      setTimeout(clearNext, 130);
+    }
+    setShake(true);
+    setTimeout(() => setShake(false), 150);
+    clearNext();
+  }
+
   function clearLinesAnimated(board){
     const rows = getFullRows(board);
     const cols = getFullCols(board);
+
     if (rows.length === 0 && cols.length === 0){
-      return board;
+      return;
     }
 
     const cellsToClear = [];
@@ -145,21 +175,8 @@ function App() {
       for (let r = 0; r < 8; r++){
         cellsToClear.push({row: r, col: c})
       }
-    })
-
-    setClearingCells(cellsToClear);
-    
-    setTimeout(() =>{
-      setBoard((prev) =>{
-        const newBoard = prev.map(row => [...row])
-        cellsToClear.forEach(({row, col}) =>{
-          newBoard[row][col] = 0;
-        });
-        return newBoard;
-      });
-      setClearingCells([]);
-    }, 300);
-    return board;
+    });
+    explodeSequential(cellsToClear);
   };
 
   return (
@@ -168,8 +185,8 @@ function App() {
       <GameBoard
         board={board}
         clearingCells={clearingCells}
+        shake={shake}
         onDragOver={handleDragOver}
-        onDragLeaveBoard={handleDragLeaveBoard}
         onDragEnd={handleDragEnd}
         onDrop={handleDrop}
         hoverCell={hoverCell}
