@@ -14,6 +14,7 @@ function App() {
   const [hoverCell, setHoverCell] = useState(null);
   const [clearingCells, setClearingCells] = useState([]);
   const [shake, setShake] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
     function handleGlobalDragend(){
@@ -23,7 +24,23 @@ function App() {
 
     window.addEventListener("dragend", handleGlobalDragend);
     return () =>{window.removeEventListener("dragend", handleGlobalDragend)}
-  }, [])
+  }, []);
+
+  function hasAnyValidMove(currentBoard, pieces) {
+    for (let p = 0; p < pieces.length; p++) {
+      const piece = pieces[p];
+      if (!piece) continue;
+
+      for (let row = 0; row < 8; row++){
+        for (let col = 0; col < 8; col++){
+          if (canPlacePiece(piece, row, col, currentBoard)){
+            return true; //Found atleast one valid move.
+          }
+        }
+      }
+    }
+    return false; //No valid moves anywhere
+  }
 
   function handleDragEnd() {
   setHoverCell(null);
@@ -71,16 +88,21 @@ function App() {
     clearLinesAnimated(newBoard);
 
     //Remove used piece
-    setAvailablePieces(prev => {
-      const updated = [...prev];
-      updated[draggedPieceIndex] = null;
-      if (updated.every(p => p === null)){
-        return generateThreePieces();
-      }
-      return updated;
-    });
+    let updatedPieces = [...availablePieces];
+    updatedPieces[draggedPieceIndex] = null;
+    
+    if (updatedPieces.every(p => p === null)){
+      updatedPieces = generateThreePieces();
+    }
+    setAvailablePieces(updatedPieces);
     setHoverCell(null);
     setDraggedPieceIndex(null);
+
+    setTimeout(() =>{
+      if (!hasAnyValidMove(newBoard, updatedPieces)){
+        setGameOver(true);
+      }
+    }, 200);
   }
   
   function canPlacePiece(piece, startRow, startCol, currentBoard = board){
@@ -182,6 +204,11 @@ function App() {
   return (
     <div>
       <h1>🧱 Block Blast Practice</h1>
+      {gameOver && (
+        <div className="game-over">
+          💀 Game Over
+        </div>
+      )}
       <GameBoard
         board={board}
         clearingCells={clearingCells}

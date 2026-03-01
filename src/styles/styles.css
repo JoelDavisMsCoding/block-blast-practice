@@ -30,8 +30,6 @@ h1 {place-content: center;}
   transition: background 0.2s;
 }
 
-
-
 .pieces-area {
   display: flex;
   justify-content: center;
@@ -88,6 +86,12 @@ h1 {place-content: center;}
 /* Invalid placement preview */
 .ghost-invalid {
   animation: flashRedWhite 0.5s infinite;
+}
+
+.game-over {
+  font-size: 2rem;
+  color: red;
+  margin: 10px 0;
 }
 
 @keyframes flashRedWhite {
