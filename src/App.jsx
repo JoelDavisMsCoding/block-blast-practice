@@ -14,17 +14,45 @@ function App() {
   const [hoverCell, setHoverCell] = useState(null);
   const [clearingCells, setClearingCells] = useState([]);
   const [shake, setShake] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOver, setGameOver] = useState(true);
+  const [isClearing, setIsClearing] = useState(false);
+
+  function restartGame() {
+  setBoard(createEmptyBoard());
+  setAvailablePieces(generateThreePieces());
+  setDraggedPieceIndex(null);
+  setHoverCell(null);
+  setClearingCells([]);
+  setShake(false);
+  setGameOver(false);
+}
 
   useEffect(() => {
     function handleGlobalDragend(){
       setHoverCell(null);
       setDraggedPieceIndex(null);
     }
-
     window.addEventListener("dragend", handleGlobalDragend);
     return () =>{window.removeEventListener("dragend", handleGlobalDragend)}
   }, []);
+
+  useEffect(() =>{
+    if (!isClearing){
+      const hasMove = hasAnyValidMove(board, availablePieces);
+      if (!hasMove){
+        setGameOver(true);
+      }
+    }
+  }, [board, availablePieces, isClearing]);
+
+  useEffect(() =>{
+    if (gameOver){
+      const timer = setTimeout(() =>{
+        restartGame();
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [gameOver]);
 
   function hasAnyValidMove(currentBoard, pieces) {
     for (let p = 0; p < pieces.length; p++) {
@@ -60,6 +88,7 @@ function App() {
   }
 
   function handleDrop(e, row, col){
+    if (gameOver) return;
     e.preventDefault();
     if (draggedPieceIndex === null) return;
     const piece = availablePieces[draggedPieceIndex];
@@ -97,12 +126,6 @@ function App() {
     setAvailablePieces(updatedPieces);
     setHoverCell(null);
     setDraggedPieceIndex(null);
-
-    setTimeout(() =>{
-      if (!hasAnyValidMove(newBoard, updatedPieces)){
-        setGameOver(true);
-      }
-    }, 200);
   }
   
   function canPlacePiece(piece, startRow, startCol, currentBoard = board){
@@ -153,10 +176,12 @@ function App() {
   }
   
   function explodeSequential(cells){
+    setIsClearing(true);
     let i = 0;
     function clearNext(){
       if (i >= cells.length){
         setClearingCells([]);
+        setIsClearing(false);
         return;
       }
 
@@ -227,8 +252,11 @@ function App() {
               key={index}
               className="piece"
               style={{gridTemplateColumns: `repeat(${piece.block[0].length}, 50px)`}} //repeat() Make same # of col as rows
-              draggable
-              onDragStart={() => setDraggedPieceIndex(index)}
+              draggable={!gameOver}
+              onDragStart={() => {
+                if (gameOver) return;
+                setDraggedPieceIndex(index);
+              }}
               onDragEnd={handleDragEnd}
             >
               {piece.block.map((row, r) =>

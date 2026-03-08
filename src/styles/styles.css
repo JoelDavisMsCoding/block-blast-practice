@@ -89,9 +89,30 @@ h1 {place-content: center;}
 }
 
 .game-over {
-  font-size: 2rem;
+  font-size: 75px;
+  font-weight: bold;
   color: red;
-  margin: 10px 0;
+  text-align: center;
+
+  animation: flashGameOver 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes flashGameOver {
+  0% {
+    opacity: 1;
+    color: red;
+  }
+
+  50% {
+    opacity: 0.2;
+    color: darkred;
+  }
+
+  100% {
+    opacity: 1;
+    color: red;
+  }
 }
 
 @keyframes flashRedWhite {
